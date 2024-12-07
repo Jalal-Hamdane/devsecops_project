@@ -94,5 +94,5 @@ pipeline{
     //         to: 'iambatmanthegoat@gmail.com',                                #change mail here
     //         attachmentsPattern: 'trivyfs.txt,trivyimage.txt'
     //     }
-    // }
+    }
 }
