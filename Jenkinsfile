@@ -15,7 +15,7 @@ pipeline{
         }
         stage('Checkout from Git'){
             steps{
-                git branch: 'main', url: 'https://github.com/Jalal-Hamdane/java-app.git'
+                git branch: 'main', url: 'https://github.com/Jalal-Hamdane/devsecops_project.git'
             }
         }
         stage("Sonarqube Analysis "){
