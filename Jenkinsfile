@@ -41,38 +41,38 @@ pipeline{
                 sh "npm install"
             }
         }
-    //     stage('OWASP FS SCAN') {
-    //         steps {
-    //             dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
-    //             dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
-    //         }
-    //     }
-    //     stage('TRIVY FS SCAN') {
-    //         steps {
-    //             sh "trivy fs . > trivyfs.txt"
-    //         }
-    //     }
-    //     stage("Docker Build & Push"){
-    //         steps{
-    //             script{
-    //                withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){   
-    //                    sh "docker build --build-arg TMDB_V3_API_KEY=<yourtmdbapikey> -t netflix ."
-    //                    sh "docker tag netflix nasi101/netflix:latest "
-    //                    sh "docker push nasi101/netflix:latest "
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     stage("TRIVY"){
-    //         steps{
-    //             sh "trivy image nasi101/netflix:latest > trivyimage.txt" 
-    //         }
-    //     }
-    //     stage('Deploy to container'){
-    //         steps{
-    //             sh 'docker run -d -p 8081:80 nasi101/netflix:latest'
-    //         }
-    //     }
+        stage('OWASP FS SCAN') {
+            steps {
+                dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DB-Check'
+                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+            }
+        }
+        stage('TRIVY FS SCAN') {
+            steps {
+                sh "trivy fs . > trivyfs.txt"
+            }
+        }
+        stage("Docker Build & Push"){
+            steps{
+                script{
+                   withDockerRegistry(credentialsId: 'dockerhub-credentials', toolName: 'docker'){   
+                       sh "docker build --build-arg TMDB_V3_API_KEY=aa9001a9ce8267101412481d2af32799 -t devsecops-project ."
+                       sh "docker tag netflix jalalhamdane/devsecops-project:latest "
+                       sh "docker push jalalhamdane/devsecops-project:latest "
+                    }
+                }
+            }
+        }
+        stage("TRIVY"){
+            steps{
+                sh "trivy image jalalhamdane/devsecops-project:latest > trivyimage.txt" 
+            }
+        }
+        stage('Deploy to container'){
+            steps{
+                sh 'docker run -d -p 8081:80 jalalhamdane/devsecops-project:latest'
+            }
+        }
     //     stage('Deploy to kubernets'){
     //         steps{
     //             script{
