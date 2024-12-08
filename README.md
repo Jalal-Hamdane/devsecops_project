@@ -14,28 +14,28 @@
   <p align="center">Home Page</p>
 </div>
 
-# Deploy Netflix Clone on Cloud using Jenkins - DevSecOps Project!
+# Déployer un Clone de Netflix sur le Cloud avec Jenkins - Projet DevSecOps!
 
-### **Phase 1: Initial Setup and Deployment**
+### **Phase 1: Configuration Initiale et Déploiement**
 
-**Step 1: Launch EC2 (Ubuntu 22.04):**
+**Étape 1 : Lancer une instance EC2 (Ubuntu 22.04) ou lancer machine virtuelle:**
 
-- Provision an EC2 instance on AWS with Ubuntu 22.04.
-- Connect to the instance using SSH.
+- Provisionner une instance EC2 sur AWS avec Ubuntu 22.04.
+- Se connecter à l'instance via SSH.
 
-**Step 2: Clone the Code:**
+**Étape 2: Cloner le Code:**
 
-- Update all the packages and then clone the code.
-- Clone your application's code repository onto the EC2 instance:
+- Mettre à jour tous les paquets, puis cloner le code.
+- Clonez le dépôt de code de votre application sur l'instance EC2 :
     
     ```bash
-    git clone https://github.com/N4si/DevSecOps-Project.git
+    git clone https://github.com/Jalal-Hamdane/devsecops_project.git
     ```
     
 
-**Step 3: Install Docker and Run the App Using a Container:**
+**Étape 3: Installer Docker et Exécuter l’Application avec un Conteneur :**
 
-- Set up Docker on the EC2 instance:
+- Configurer Docker sur l'instance EC2 :
     
     ```bash
     
@@ -46,7 +46,7 @@
     sudo chmod 777 /var/run/docker.sock
     ```
     
-- Build and run your application using Docker containers:
+- Construire et exécuter votre application en utilisant des conteneurs Docker :
     
     ```bash
     docker build -t netflix .
@@ -57,27 +57,27 @@
     docker rmi -f netflix
     ```
 
-It will show an error cause you need API key
+Cela affichera une erreur car vous avez besoin d'une clé API
 
-**Step 4: Get the API Key:**
+**Étape 4: Obtenir la Clé API :**
 
-- Open a web browser and navigate to TMDB (The Movie Database) website.
-- Click on "Login" and create an account.
-- Once logged in, go to your profile and select "Settings."
-- Click on "API" from the left-side panel.
-- Create a new API key by clicking "Create" and accepting the terms and conditions.
-- Provide the required basic details and click "Submit."
-- You will receive your TMDB API key.
+- Ouvrir un navigateur et se rendre sur le site TMDB (The Movie Database).
+- Créer un compte en cliquant sur "Login".
+- Une fois connecté, allez dans votre profil, puis dans "Settings".
+- Cliquez sur "API" dans le panneau de gauche.
+- Créez une nouvelle clé API en cliquant sur "Create" et en acceptant les conditions.
+- Vous recevrez votre clé API TMDB.
 
-Now recreate the Docker image with your api key:
+
+Maintenant, recréez l'image Docker avec votre clé API :
 ```
 docker build --build-arg TMDB_V3_API_KEY=<your-api-key> -t netflix .
 ```
 
-**Phase 2: Security**
+**Phase 2: Sécurité**
 
-1. **Install SonarQube and Trivy:**
-    - Install SonarQube and Trivy on the EC2 instance to scan for vulnerabilities.
+1. **Installer SonarQube et Trivy :**
+    - Installez SonarQube et Trivy sur l'instance EC2 pour analyser les vulnérabilités.
         
         sonarqube
         ```
@@ -85,11 +85,11 @@ docker build --build-arg TMDB_V3_API_KEY=<your-api-key> -t netflix .
         ```
         
         
-        To access: 
+        Pour y accéder :
         
-        publicIP:9000 (by default username & password is admin)
+        Allez sur publicIP:9000 (par défaut, le nom d’utilisateur et le mot de passe sont "admin").
         
-        To install Trivy:
+        Pour installer Trivy:
         ```
         sudo apt-get install wget apt-transport-https gnupg lsb-release
         wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
@@ -98,20 +98,21 @@ docker build --build-arg TMDB_V3_API_KEY=<your-api-key> -t netflix .
         sudo apt-get install trivy        
         ```
         
-        to scan image using trivy
+        Pour analyser l'image avec Trivy :
         ```
         trivy image <imageid>
         ```
         
         
-2. **Integrate SonarQube and Configure:**
-    - Integrate SonarQube with your CI/CD pipeline.
-    - Configure SonarQube to analyze code for quality and security issues.
+2. **Intégrer SonarQube et Configurer :**
+    - Intégrer SonarQube avec votre pipeline CI/CD.
+    - Configurer SonarQube pour analyser le code pour les problèmes de qualité et de sécurité.
 
-**Phase 3: CI/CD Setup**
 
-1. **Install Jenkins for Automation:**
-    - Install Jenkins on the EC2 instance to automate deployment:
+**Phase 3: Configuration CI/CD**
+
+1. **Installer Jenkins pour l’automatisation :**
+    - Installez Jenkins sur l’instance EC2 pour automatiser le déploiement.:
     Install Java
     
     ```bash
@@ -134,138 +135,153 @@ docker build --build-arg TMDB_V3_API_KEY=<your-api-key> -t netflix .
     sudo systemctl enable jenkins
     ```
     
-    - Access Jenkins in a web browser using the public IP of your EC2 instance.
+    - Accédez à Jenkins via le navigateur avec l'IP publique de votre instance EC2 :
         
         publicIp:8080
         
-2. **Install Necessary Plugins in Jenkins:**
+2. **Installer les Plugins Nécessaires dans Jenkins:**
 
-Goto Manage Jenkins →Plugins → Available Plugins →
+Allez dans "Manage Jenkins" → "Plugins" → "Available Plugins" et installez les plugins suivants : →
 
-Install below plugins
+Installer plugins
 
-1 Eclipse Temurin Installer (Install without restart)
+1 Eclipse Temurin Installer 
 
-2 SonarQube Scanner (Install without restart)
+2 SonarQube Scanner 
 
-3 NodeJs Plugin (Install Without restart)
+3 NodeJs Plugin
 
 4 Email Extension Plugin
 
-### **Configure Java and Nodejs in Global Tool Configuration**
+### **Configurer Java et NodeJS dans la Configuration Outils Globale**
 
-Goto Manage Jenkins → Tools → Install JDK(17) and NodeJs(16)→ Click on Apply and Save
+Allez dans "Manage Jenkins" → "Tools" → Installez JDK (17) et NodeJS (16).
 
 
 ### SonarQube
 
-Create the token
+Créer le token
 
-Goto Jenkins Dashboard → Manage Jenkins → Credentials → Add Secret Text. It should look like this
+Allez sur le tableau de bord Jenkins → Gérer Jenkins → Identifiants → Ajouter un texte secret. Cela devrait ressembler à ceci.
 
-After adding sonar token
+Après avoir ajouté le token Sonar,
 
-Click on Apply and Save
+Cliquez sur Appliquer et Sauvegarder.
 
-**The Configure System option** is used in Jenkins to configure different server
+**L'option Configurer le Système** est utilisée dans Jenkins pour configurer différents serveurs.
 
-**Global Tool Configuration** is used to configure different tools that we install using Plugins
+**Configuration des outils globaux** ist utilisée pour configurer différents outils que nous installons à l'aide de plugins.
 
-We will install a sonar scanner in the tools.
+Nous allons installer un scanner Sonar dans les outils.
 
-Create a Jenkins webhook
+Créer un Webhook Jenkins 
 
-1. **Configure CI/CD Pipeline in Jenkins:**
-- Create a CI/CD pipeline in Jenkins to automate your application deployment.
+1. **Configurer le Pipeline CI/CD dans Jenkins :**
+- Créez un pipeline CI/CD dans Jenkins pour automatiser le déploiement de votre application.
 
 ```groovy
 pipeline {
     agent any
+
     tools {
         jdk 'jdk17'
         nodejs 'node16'
     }
+
     environment {
         SCANNER_HOME = tool 'sonar-scanner'
     }
+
     stages {
-        stage('clean workspace') {
+        stage('Clean Workspace') {
             steps {
                 cleanWs()
             }
         }
+
         stage('Checkout from Git') {
             steps {
-                git branch: 'main', url: 'https://github.com/N4si/DevSecOps-Project.git'
+                git branch: 'master', url: 'https://github.com/Jalal-Hamdane/devsecops_project.git'
             }
         }
-        stage("Sonarqube Analysis") {
+
+        stage("SonarQube Analysis") {
             steps {
                 withSonarQubeEnv('sonar-server') {
-                    sh '''$SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Netflix \
-                    -Dsonar.projectKey=Netflix'''
+                    sh '''
+                        $SCANNER_HOME/bin/sonar-scanner \
+                        -Dsonar.projectName="Netflix" \
+                        -Dsonar.projectKey="Netflix"
+                    '''
                 }
             }
         }
-        stage("quality gate") {
+
+        stage("Quality Gate") {
             steps {
                 script {
-                    waitForQualityGate abortPipeline: false, credentialsId: 'Sonar-token'
+                    // Wait for the quality gate result before proceeding
+                    def qg = waitForQualityGate(credentialsId: 'Sonar-token', abortPipeline: true)
+                    if (qg.status != 'OK') {
+                        error "SonarQube Quality Gate failed: ${qg.status}"
+                    }
                 }
             }
         }
+
         stage('Install Dependencies') {
             steps {
-                sh "npm install"
+                sh 'npm install'
             }
         }
     }
 }
 ```
 
-Certainly, here are the instructions without step numbers:
 
-**Install Dependency-Check and Docker Tools in Jenkins**
+Bien sûr, voici les instructions sans les numéros d'étapes 
 
-**Install Dependency-Check Plugin:**
+**Installer Dependency-Check et les outils Docker dans Jenkins**
 
-- Go to "Dashboard" in your Jenkins web interface.
-- Navigate to "Manage Jenkins" → "Manage Plugins."
-- Click on the "Available" tab and search for "OWASP Dependency-Check."
-- Check the checkbox for "OWASP Dependency-Check" and click on the "Install without restart" button.
+**Installer le plugin Dependency-Check :**
 
-**Configure Dependency-Check Tool:**
+- Allez dans le "Tableau de bord" de votre interface web Jenkins.
+- Naviguez vers "Gérer Jenkins" → "Gérer les plugins."
+- Cliquez sur l'onglet "Disponible" et recherchez "OWASP Dependency-Check."
+- Cochez la case pour "OWASP Dependency-Check" et cliquez sur le bouton "Installer sans redémarrer."
 
-- After installing the Dependency-Check plugin, you need to configure the tool.
-- Go to "Dashboard" → "Manage Jenkins" → "Global Tool Configuration."
-- Find the section for "OWASP Dependency-Check."
-- Add the tool's name, e.g., "DP-Check."
-- Save your settings.
+**Configurer l'outil Dependency-Check :**
 
-**Install Docker Tools and Docker Plugins:**
+- Après avoir installé le plugin Dependency-Check, vous devez configurer l'outil.
+- Allez dans "Tableau de bord" → "Gérer Jenkins" → "Configuration des outils globaux."
+- Trouvez la section "OWASP Dependency-Check."
+- Ajoutez le nom de l'outil, par exemple, "DP-Check."
+- Sauvegardez vos paramètres.
 
-- Go to "Dashboard" in your Jenkins web interface.
-- Navigate to "Manage Jenkins" → "Manage Plugins."
-- Click on the "Available" tab and search for "Docker."
-- Check the following Docker-related plugins:
-  - Docker
-  - Docker Commons
-  - Docker Pipeline
-  - Docker API
-  - docker-build-step
-- Click on the "Install without restart" button to install these plugins.
+**Installer les outils Docker et les plugins Docker :**
 
-**Add DockerHub Credentials:**
+- Allez dans le "Tableau de bord" de votre interface web Jenkins.
+- Naviguez vers "Gérer Jenkins" → "Gérer les plugins."
+- Cliquez sur l'onglet "Disponible" et recherchez "Docker."
+- Cochez les plugins Docker suivants :
+    - Docker
+    - Docker Commons
+    - Docker Pipeline
+    - Docker API
+    - docker-build-step
+- Cliquez sur le bouton "Installer sans redémarrer" pour installer ces plugins.
 
-- To securely handle DockerHub credentials in your Jenkins pipeline, follow these steps:
-  - Go to "Dashboard" → "Manage Jenkins" → "Manage Credentials."
-  - Click on "System" and then "Global credentials (unrestricted)."
-  - Click on "Add Credentials" on the left side.
-  - Choose "Secret text" as the kind of credentials.
-  - Enter your DockerHub credentials (Username and Password) and give the credentials an ID (e.g., "docker").
-  - Click "OK" to save your DockerHub credentials.
+**Ajouter les identifiants DockerHub :**
 
-Now, you have installed the Dependency-Check plugin, configured the tool, and added Docker-related plugins along with your DockerHub credentials in Jenkins. You can now proceed with configuring your Jenkins pipeline to include these tools and credentials in your CI/CD process.
+- Pour gérer de manière sécurisée les identifiants DockerHub dans votre pipeline Jenkins, suivez ces étapes :
+    - Allez dans "Tableau de bord" → "Gérer Jenkins" → "Gérer les identifiants."
+    - Cliquez sur "Système", puis sur "Identifiants globaux (non restreints)."
+    - Cliquez sur "Ajouter des identifiants" sur la gauche.
+    - Choisissez "Texte secret" comme type d'identifiant.
+    - Entrez vos identifiants DockerHub (Nom d'utilisateur et Mot de passe) et donnez un ID à l'identifiant (par exemple, "docker").
+    - Cliquez sur "OK" pour sauvegarder vos identifiants DockerHub.
+
+Vous avez maintenant installé le plugin Dependency-Check, configuré l'outil et ajouté les plugins Docker ainsi que vos identifiants DockerHub dans Jenkins. Vous pouvez maintenant configurer votre pipeline Jenkins pour inclure ces outils et identifiants dans votre processus CI/CD.
 
 ```groovy
 
@@ -286,14 +302,17 @@ pipeline{
         }
         stage('Checkout from Git'){
             steps{
-                git branch: 'main', url: 'https://github.com/N4si/DevSecOps-Project.git'
+                git branch: 'master', url: 'https://github.com/Jalal-Hamdane/devsecops_project.git'
             }
         }
-        stage("Sonarqube Analysis "){
-            steps{
+        stage("Sonarqube Analysis") {
+            steps {
                 withSonarQubeEnv('sonar-server') {
-                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Netflix \
-                    -Dsonar.projectKey=Netflix '''
+                    sh '''
+                        $SCANNER_HOME/bin/sonar-scanner \
+                        -Dsonar.projectName=Netflix \
+                        -Dsonar.projectKey=Netflix
+                    '''
                 }
             }
         }
@@ -311,7 +330,7 @@ pipeline{
         }
         stage('OWASP FS SCAN') {
             steps {
-                dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
+                dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DB-Check'
                 dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
             }
         }
@@ -323,29 +342,19 @@ pipeline{
         stage("Docker Build & Push"){
             steps{
                 script{
-                   withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){   
-                       sh "docker build --build-arg TMDB_V3_API_KEY=<yourapikey> -t netflix ."
-                       sh "docker tag netflix nasi101/netflix:latest "
-                       sh "docker push nasi101/netflix:latest "
+                   withDockerRegistry(credentialsId: 'dockerhub-credentials', toolName: 'docker'){   
+                       sh "docker build --build-arg TMDB_V3_API_KEY=aa9001a9ce8267101412481d2af32799 -t devsecops-project ."
+                       sh "docker tag netflix jalalhamdane/devsecops-project:latest "
+                       sh "docker push jalalhamdane/devsecops-project:latest "
                     }
                 }
             }
         }
-        stage("TRIVY"){
-            steps{
-                sh "trivy image nasi101/netflix:latest > trivyimage.txt" 
-            }
-        }
-        stage('Deploy to container'){
-            steps{
-                sh 'docker run -d --name netflix -p 8081:80 nasi101/netflix:latest'
-            }
-        }
-    }
+    }    
 }
 
 
-If you get docker login failed errorr
+Si vous obtenez une erreur "docker login failed", exécutez les commandes suivantes :
 
 sudo su
 sudo usermod -aG docker jenkins
