@@ -363,22 +363,22 @@ sudo systemctl restart jenkins
 
 ```
 
-**Phase 4: Monitoring**
+**Phase 4: Surveillance**
 
-1. **Install Prometheus and Grafana:**
+1. **nstaller Prometheus et Grafana :**
 
-   Set up Prometheus and Grafana to monitor your application.
+   Installez Prometheus et Grafana pour surveiller votre application.
 
-   **Installing Prometheus:**
+   **Installation de Prometheus :**
 
-   First, create a dedicated Linux user for Prometheus and download Prometheus:
+   Créez un utilisateur Linux dédié pour Prometheus et téléchargez Prometheus :
 
    ```bash
    sudo useradd --system --no-create-home --shell /bin/false prometheus
    wget https://github.com/prometheus/prometheus/releases/download/v2.47.1/prometheus-2.47.1.linux-amd64.tar.gz
    ```
 
-   Extract Prometheus files, move them, and create directories:
+   Décompressez les fichiers et configurez Prometheus.
 
    ```bash
    tar -xvf prometheus-2.47.1.linux-amd64.tar.gz
@@ -389,19 +389,19 @@ sudo systemctl restart jenkins
    sudo mv prometheus.yml /etc/prometheus/prometheus.yml
    ```
 
-   Set ownership for directories:
+   Définir la propriété des répertoires:
 
    ```bash
    sudo chown -R prometheus:prometheus /etc/prometheus/ /data/
    ```
 
-   Create a systemd unit configuration file for Prometheus:
+   Créer un fichier de configuration d'unité systemd pour Prometheus :
 
    ```bash
    sudo nano /etc/systemd/system/prometheus.service
    ```
 
-   Add the following content to the `prometheus.service` file:
+   Ajouter le contenu suivant dans le fichier `prometheus.service` :
 
    ```plaintext
    [Unit]
@@ -430,43 +430,44 @@ sudo systemctl restart jenkins
    WantedBy=multi-user.target
    ```
 
-   Here's a brief explanation of the key parts in this `prometheus.service` file:
+   Voici une brève explication des parties clés dans ce fichier `prometheus.service`:
 
-   - `User` and `Group` specify the Linux user and group under which Prometheus will run.
+   - `User` et `Group` spécifient l'utilisateur et le groupe Linux sous lesquels Prometheus s'exécutera.
 
-   - `ExecStart` is where you specify the Prometheus binary path, the location of the configuration file (`prometheus.yml`), the storage directory, and other settings.
+   - `ExecStart` est l'endroit où vous spécifiez le chemin du binaire Prometheus, l'emplacement du fichier de configuration  (`prometheus.yml`), e répertoire de stockage et d'autres paramètres.
 
-   - `web.listen-address` configures Prometheus to listen on all network interfaces on port 9090.
+   - `web.listen-address` configure Prometheus pour écouter sur toutes les interfaces réseau sur le port 9090.
 
-   - `web.enable-lifecycle` allows for management of Prometheus through API calls.
+   - `web.enable-lifecycle` permet la gestion de Prometheus via des appels API.
 
-   Enable and start Prometheus:
+
+   Activer et démarrer Prometheus :
 
    ```bash
    sudo systemctl enable prometheus
    sudo systemctl start prometheus
    ```
 
-   Verify Prometheus's status:
+   Vérifier le statut de Prometheus :
 
    ```bash
    sudo systemctl status prometheus
    ```
 
-   You can access Prometheus in a web browser using your server's IP and port 9090:
+   Vous pouvez accéder à Prometheus via un navigateur web en utilisant l'IP de votre serveur et le port 9090 :
 
    `http://<your-server-ip>:9090`
 
-   **Installing Node Exporter:**
+   **Installation de Node Exporter :**
 
-   Create a system user for Node Exporter and download Node Exporter:
+   Créer un utilisateur système pour Node Exporter et télécharger Node Exporter :
 
    ```bash
    sudo useradd --system --no-create-home --shell /bin/false node_exporter
    wget https://github.com/prometheus/node_exporter/releases/download/v1.6.1/node_exporter-1.6.1.linux-amd64.tar.gz
    ```
 
-   Extract Node Exporter files, move the binary, and clean up:
+   Extraire les fichiers de Node Exporter, déplacer le binaire et nettoyer :
 
    ```bash
    tar -xvf node_exporter-1.6.1.linux-amd64.tar.gz
@@ -474,13 +475,13 @@ sudo systemctl restart jenkins
    rm -rf node_exporter*
    ```
 
-   Create a systemd unit configuration file for Node Exporter:
+   Créer un fichier de configuration pour l'unité systemd de Node Exporter :
 
    ```bash
    sudo nano /etc/systemd/system/node_exporter.service
    ```
 
-   Add the following content to the `node_exporter.service` file:
+   Ajoutez le contenu suivant au fichier `node_exporter.service` :
 
    ```plaintext
    [Unit]
@@ -503,30 +504,30 @@ sudo systemctl restart jenkins
    WantedBy=multi-user.target
    ```
 
-   Replace `--collector.logind` with any additional flags as needed.
+   Remplacez  `--collector.logind` par des options supplémentaires si nécessaire.
 
-   Enable and start Node Exporter:
+   Activez et démarrez Node Exporter :
 
    ```bash
    sudo systemctl enable node_exporter
    sudo systemctl start node_exporter
    ```
 
-   Verify the Node Exporter's status:
+   Vérifiez l'état de Node Exporter :
 
    ```bash
    sudo systemctl status node_exporter
    ```
 
-   You can access Node Exporter metrics in Prometheus.
+   Vous pouvez accéder aux métriques de Node Exporter dans Prometheus.
 
-2. **Configure Prometheus Plugin Integration:**
+2. **Configurer l'intégration du plugin Prometheus :**
 
-   Integrate Jenkins with Prometheus to monitor the CI/CD pipeline.
+   Intégrer Jenkins avec Prometheus pour surveiller le pipeline CI/CD.
 
-   **Prometheus Configuration:**
+   **Configuration de Prometheus :**
 
-   To configure Prometheus to scrape metrics from Node Exporter and Jenkins, you need to modify the `prometheus.yml` file. Here is an example `prometheus.yml` configuration for your setup:
+   Pour configurer Prometheus afin qu'il scrape les métriques de Node Exporter et Jenkins, vous devez modifier le fichier `prometheus.yml` . Voici un exemple de configuration  `prometheus.yml` pour votre installation :
 
    ```yaml
    global:
@@ -540,184 +541,175 @@ sudo systemctl restart jenkins
      - job_name: 'jenkins'
        metrics_path: '/prometheus'
        static_configs:
-         - targets: ['<your-jenkins-ip>:<your-jenkins-port>']
+         - targets: ['<votre-ip-jenkins>:<votre-port-jenkins>']
    ```
 
-   Make sure to replace `<your-jenkins-ip>` and `<your-jenkins-port>` with the appropriate values for your Jenkins setup.
+   Assurez-vous de remplacer `<votre-ip-jenkins>` et `<votre-port-jenkins>` par les valeurs appropriées pour votre installation Jenkins.
 
-   Check the validity of the configuration file:
+   Vérifiez la validité du fichier de configuration :
 
    ```bash
    promtool check config /etc/prometheus/prometheus.yml
    ```
 
-   Reload the Prometheus configuration without restarting:
+   Rechargez la configuration de Prometheus sans redémarrer :
 
    ```bash
    curl -X POST http://localhost:9090/-/reload
    ```
 
-   You can access Prometheus targets at:
+   Vous pouvez accéder aux cibles de Prometheus à l'adresse :
 
-   `http://<your-prometheus-ip>:9090/targets`
+   `http://<votre-ip-prometheus>:9090/targets`
 
 
 ####Grafana
 
-**Install Grafana on Ubuntu 22.04 and Set it up to Work with Prometheus**
+**Installer Grafana sur Ubuntu 22.04 et le configurer pour fonctionner avec Prometheus**
 
-**Step 1: Install Dependencies:**
+**Étape 1 : Installer les dépendances :**
 
-First, ensure that all necessary dependencies are installed:
+Commencez par vous assurer que toutes les dépendances nécessaires sont installées :
 
 ```bash
 sudo apt-get update
 sudo apt-get install -y apt-transport-https software-properties-common
 ```
 
-**Step 2: Add the GPG Key:**
+**Étape 2 : Ajouter la clé GPG :**
 
-Add the GPG key for Grafana:
+Ajoutez la clé GPG pour Grafana :
 
 ```bash
 wget -q -O - https://packages.grafana.com/gpg.key | sudo apt-key add -
 ```
 
-**Step 3: Add Grafana Repository:**
+**Étape 3 : Ajouter le dépôt Grafana :**
 
-Add the repository for Grafana stable releases:
+Ajoutez le dépôt pour les versions stables de Grafana :
 
 ```bash
 echo "deb https://packages.grafana.com/oss/deb stable main" | sudo tee -a /etc/apt/sources.list.d/grafana.list
 ```
 
-**Step 4: Update and Install Grafana:**
+**Étape 4 : Mettre à jour et installer Grafana :**
 
-Update the package list and install Grafana:
+Mettez à jour la liste des paquets et installez Grafana :
 
 ```bash
 sudo apt-get update
 sudo apt-get -y install grafana
 ```
 
-**Step 5: Enable and Start Grafana Service:**
+**Étape 5 : Activer et démarrer le service Grafana :**
 
-To automatically start Grafana after a reboot, enable the service:
+Pour démarrer automatiquement Grafana après un redémarrage, activez le service :
 
 ```bash
 sudo systemctl enable grafana-server
 ```
 
-Then, start Grafana:
+Puis, démarrez Grafana :
 
 ```bash
 sudo systemctl start grafana-server
 ```
 
-**Step 6: Check Grafana Status:**
+**Étape 6 : Vérifier l'état de Grafana :**
 
-Verify the status of the Grafana service to ensure it's running correctly:
+Vérifiez l'état du service Grafana pour vous assurer qu'il fonctionne correctement :
 
 ```bash
 sudo systemctl status grafana-server
 ```
 
-**Step 7: Access Grafana Web Interface:**
+**Étape 7 : Accéder à l'interface Web de Grafana :**
 
-Open a web browser and navigate to Grafana using your server's IP address. The default port for Grafana is 3000. For example:
+Ouvrez un navigateur Web et accédez à Grafana en utilisant l'adresse IP de votre serveur. Le port par défaut de Grafana est le 3000. Par exemple :
 
-`http://<your-server-ip>:3000`
+`http://<votre-ip-serveur>:3000`
 
-You'll be prompted to log in to Grafana. The default username is "admin," and the default password is also "admin."
+Vous serez invité à vous connecter à Grafana. Le nom d'utilisateur par défaut est "admin", et le mot de passe par défaut est également "admin".
 
-**Step 8: Change the Default Password:**
+**Étape 8 : Modifier le mot de passe par défaut :**
 
-When you log in for the first time, Grafana will prompt you to change the default password for security reasons. Follow the prompts to set a new password.
-
-**Step 9: Add Prometheus Data Source:**
-
-To visualize metrics, you need to add a data source. Follow these steps:
-
-- Click on the gear icon (⚙️) in the left sidebar to open the "Configuration" menu.
-
-- Select "Data Sources."
-
-- Click on the "Add data source" button.
-
-- Choose "Prometheus" as the data source type.
-
-- In the "HTTP" section:
-  - Set the "URL" to `http://localhost:9090` (assuming Prometheus is running on the same server).
-  - Click the "Save & Test" button to ensure the data source is working.
-
-**Step 10: Import a Dashboard:**
-
-To make it easier to view metrics, you can import a pre-configured dashboard. Follow these steps:
-
-- Click on the "+" (plus) icon in the left sidebar to open the "Create" menu.
-
-- Select "Dashboard."
-
-- Click on the "Import" dashboard option.
-
-- Enter the dashboard code you want to import (e.g., code 1860).
-
-- Click the "Load" button.
-
-- Select the data source you added (Prometheus) from the dropdown.
-
-- Click on the "Import" button.
-
-You should now have a Grafana dashboard set up to visualize metrics from Prometheus.
-
-Grafana is a powerful tool for creating visualizations and dashboards, and you can further customize it to suit your specific monitoring needs.
-
-That's it! You've successfully installed and set up Grafana to work with Prometheus for monitoring and visualization.
-
-2. **Configure Prometheus Plugin Integration:**
-    - Integrate Jenkins with Prometheus to monitor the CI/CD pipeline.
+Lors de votre première connexion, Grafana vous demandera de changer le mot de passe par défaut pour des raisons de sécurité. Suivez les instructions pour définir un nouveau mot de passe.
 
 
-**Phase 5: Notification**
+**Étape 9 : Ajouter une source de données Prometheus :**
 
-1. **Implement Notification Services:**
-    - Set up email notifications in Jenkins or other notification mechanisms.
+Pour visualiser les métriques, vous devez ajouter une source de données. Suivez ces étapes :
+
+- Cliquez sur l'icône en forme de roue dentée (⚙️) dans la barre latérale gauche pour ouvrir le menu "Configuration".
+- Sélectionnez "Sources de données".
+- Cliquez sur le bouton "Ajouter une source de données".
+- Choisissez "Prometheus" comme type de source de données.
+Dans la section "HTTP" :
+    - Définissez l'URL sur http://localhost:9090 (en supposant que Prometheus fonctionne sur le même serveur).
+    - Cliquez sur le bouton "Sauvegarder & Tester" pour vérifier que la source de données fonctionne.
+
+**Étape 10 : Importer un tableau de bord :**
+
+Pour faciliter la visualisation des métriques, vous pouvez importer un tableau de bord pré-configuré. Suivez ces étapes :
+
+- Cliquez sur l'icône "+" (plus) dans la barre latérale gauche pour ouvrir le menu "Créer".
+- Sélectionnez "Tableau de bord".
+- Cliquez sur l'option "Importer" le tableau de bord.
+- Entrez le code du tableau de bord que vous souhaitez importer (par exemple, le code 1860).
+- Cliquez sur le bouton "Charger".
+- Sélectionnez la source de données que vous avez ajoutée (Prometheus) dans le menu déroulant.
+- Cliquez sur le bouton "Importer".
+
+Vous devriez maintenant avoir un tableau de bord Grafana configuré pour visualiser les métriques de Prometheus.
+
+Grafana est un outil puissant pour créer des visualisations et des tableaux de bord, et vous pouvez le personnaliser davantage pour répondre à vos besoins de surveillance spécifiques.
+
+Voilà ! Vous avez maintenant installé et configuré Grafana pour travailler avec Prometheus pour la surveillance et la visualisation.
+
+2. **Configurer l'intégration du plugin Prometheus:**
+    - Intégrer Jenkins avec Prometheus pour surveiller le pipeline CI/CD.
+
+
+**Phase 5 : Notifications**
+
+1. **Mettre en place des services de notifications :**
+    - Configurez les notifications par e-mail dans Jenkins ou d'autres mécanismes de notification.
 
 # Phase 6: Kubernetes
 
-## Create Kubernetes Cluster with Nodegroups
+## Créer un cluster Kubernetes avec des groupes de nœuds
 
-In this phase, you'll set up a Kubernetes cluster with node groups. This will provide a scalable environment to deploy and manage your applications.
+Dans cette phase, vous allez configurer un cluster Kubernetes avec des groupes de nœuds. Cela fournira un environnement évolutif pour déployer et gérer vos applications.
 
-## Monitor Kubernetes with Prometheus
+## Surveiller Kubernetes avec Prometheus
 
-Prometheus is a powerful monitoring and alerting toolkit, and you'll use it to monitor your Kubernetes cluster. Additionally, you'll install the node exporter using Helm to collect metrics from your cluster nodes.
+Prometheus est un outil puissant de surveillance et d'alerte, et vous l'utiliserez pour surveiller votre cluster Kubernetes. De plus, vous installerez le node exporter via Helm pour collecter des métriques depuis vos nœuds de cluster.
 
 ### Install Node Exporter using Helm
 
-To begin monitoring your Kubernetes cluster, you'll install the Prometheus Node Exporter. This component allows you to collect system-level metrics from your cluster nodes. Here are the steps to install the Node Exporter using Helm:
+Pour commencer à surveiller votre cluster Kubernetes, vous allez installer Prometheus Node Exporter. Ce composant permet de collecter des métriques au niveau du système depuis vos nœuds de cluster. Voici les étapes pour installer le Node Exporter avec Helm :
 
-1. Add the Prometheus Community Helm repository:
+1. Ajouter le dépôt Helm de la communauté Prometheus :
 
     ```bash
     helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
     ```
 
-2. Create a Kubernetes namespace for the Node Exporter:
+2. Créer un espace de noms Kubernetes pour Node Exporter :
 
     ```bash
     kubectl create namespace prometheus-node-exporter
     ```
 
-3. Install the Node Exporter using Helm:
+3. Installer Node Exporter avec Helm :
 
     ```bash
     helm install prometheus-node-exporter prometheus-community/prometheus-node-exporter --namespace prometheus-node-exporter
     ```
 
-Add a Job to Scrape Metrics on nodeip:9001/metrics in prometheus.yml:
+Ajoutez un job pour scrapper les métriques sur nodeip:9001/metrics dans  prometheus.yml:
 
-Update your Prometheus configuration (prometheus.yml) to add a new job for scraping metrics from nodeip:9001/metrics. You can do this by adding the following configuration to your prometheus.yml file:
+UMettez à jour votre configuration Prometheus (prometheus.yml) pour ajouter un nouveau job afin de scraper les métriques depuis nodeip:9001/metrics. Vous pouvez ajouter la configuration suivante à votre fichier prometheus.yml :
 
 
 ```
@@ -727,33 +719,31 @@ Update your Prometheus configuration (prometheus.yml) to add a new job for scrap
       - targets: ['node1Ip:9100']
 ```
 
-Replace 'your-job-name' with a descriptive name for your job. The static_configs section specifies the targets to scrape metrics from, and in this case, it's set to nodeip:9001.
+Remplacez node1Ip par l'adresse IP de votre noeud. N'oubliez pas de recharger ou redémarrer Prometheus pour appliquer ces modifications à votre configuration.
 
-Don't forget to reload or restart Prometheus to apply these changes to your configuration.
+Pour déployer une application avec ArgoCD, vous pouvez suivre ces étapes, que je vais détailler en format Markdown :
 
-To deploy an application with ArgoCD, you can follow these steps, which I'll outline in Markdown format:
-
-### Deploy Application with ArgoCD
+### Déployer une application avec ArgoCD
 
 1. **Install ArgoCD:**
 
-   You can install ArgoCD on your Kubernetes cluster by following the instructions provided in the [EKS Workshop](https://archive.eksworkshop.com/intermediate/290_argocd/install/) documentation.
+   Vous pouvez installer ArgoCD sur votre cluster Kubernetes en suivant les instructions fournies dans la documentation  [EKS Workshop](https://archive.eksworkshop.com/intermediate/290_argocd/install/) .
 
-2. **Set Your GitHub Repository as a Source:**
+2. **Configurer votre référentiel GitHub comme source :**
 
-   After installing ArgoCD, you need to set up your GitHub repository as a source for your application deployment. This typically involves configuring the connection to your repository and defining the source for your ArgoCD application. The specific steps will depend on your setup and requirements.
+   Après avoir installé ArgoCD, vous devez configurer votre référentiel GitHub comme source pour le déploiement de votre application. Cela implique généralement de configurer la connexion à votre référentiel et de définir la source de votre application ArgoCD. Les étapes exactes dépendront de votre configuration.
 
-3. **Create an ArgoCD Application:**
-   - `name`: Set the name for your application.
-   - `destination`: Define the destination where your application should be deployed.
-   - `project`: Specify the project the application belongs to.
-   - `source`: Set the source of your application, including the GitHub repository URL, revision, and the path to the application within the repository.
-   - `syncPolicy`: Configure the sync policy, including automatic syncing, pruning, and self-healing.
+3. **Créer une application ArgoCD :**
+   - `name`: Définissez le nom de votre application.
+   - `destination`: Définissez la destination où votre application doit être déployée.
+   - `project`: Spécifiez le projet auquel l'application appartient.
+   - `source`: Définissez la source de votre application, y compris l'URL du référentiel GitHub, la révision et le chemin de l'application dans le référentiel.
+   - `syncPolicy`: Configurez la politique de synchronisation, y compris la synchronisation automatique, l'élagage et l'auto-guérison.
 
-4. **Access your Application**
-   - To Access the app make sure port 30007 is open in your security group and then open a new tab paste your NodeIP:30007, your app should be running.
+4. **Accéder à votre application :**
+   - Pour accéder à l'application, assurez-vous que le port 30007 est ouvert dans votre groupe de sécurité, puis ouvrez un nouvel onglet et saisissez NodeIP:30007, Votre application devrait maintenant être en cours d'exécution.
 
-**Phase 7: Cleanup**
+**Phase 7 : Nettoyage**
 
-1. **Cleanup AWS EC2 Instances:**
-    - Terminate AWS EC2 instances that are no longer needed.
+1. **Nettoyer les instances EC2 AWS**
+    - Terminez les instances EC2 AWS qui ne sont plus nécessaires.
