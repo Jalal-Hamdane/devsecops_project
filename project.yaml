@@ -1,0 +1,12 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: devsecops-project
+  namespace: argocd
+spec:
+  description: "Projet pour déploiement sécurisé"
+  destinations:
+  - namespace: '*'
+    server: 'https://kubernetes.default.svc'
+  sourceRepos:
+  - '*'
