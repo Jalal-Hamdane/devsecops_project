@@ -29,4 +29,7 @@ yarn-error.log*
 
 # terraform vars
 terraform.tfvars
-.terraform.lock.hcl
+# Ignore terraform provider binaries and lock files
+terraform/.terraform/
+terraform/.terraform.lock.hcl
+
