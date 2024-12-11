@@ -1,0 +1,140 @@
+---
+- name: Déploiement Complet DevSecOps
+  hosts: all
+  become: yes
+
+  tasks:
+
+    # -------------------- Installation Docker --------------------
+    - name: Mettre à jour les paquets
+      apt:
+        update_cache: yes
+
+    - name: Installer Docker
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Ajouter l'utilisateur au groupe Docker
+      user:
+        name: "{{ ansible_user }}"
+        groups: "docker"
+        append: yes
+
+    - name: Changer les permissions du socket Docker
+      file:
+        path: /var/run/docker.sock
+        mode: '0777'
+
+    # -------------------- Installation de Trivy --------------------
+    - name: Installer Trivy
+      shell: |
+        sudo apt-get install -y wget apt-transport-https gnupg lsb-release
+        wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+        echo "deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
+        sudo apt-get update && sudo apt-get install -y trivy
+
+    # -------------------- Installation Java et Jenkins --------------------
+    - name: Installer Java
+      apt:
+        name: openjdk-17-jre
+        state: present
+
+    - name: Installer Jenkins
+      shell: |
+        sudo wget -O /usr/share/keyrings/jenkins-keyring.asc https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+        echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/" | sudo tee /etc/apt/sources.list.d/jenkins.list
+        sudo apt-get update
+        sudo apt-get install -y jenkins
+        sudo systemctl start jenkins
+        sudo systemctl enable jenkins
+
+    # -------------------- Installation Prometheus --------------------
+    - name: Installer Prometheus
+      shell: |
+        sudo useradd --system --no-create-home --shell /bin/false prometheus
+        wget https://github.com/prometheus/prometheus/releases/download/v2.47.1/prometheus-2.47.1.linux-amd64.tar.gz
+        tar -xvf prometheus-2.47.1.linux-amd64.tar.gz
+        sudo mkdir -p /data /etc/prometheus
+        sudo mv prometheus-2.47.1.linux-amd64/prometheus promtool /usr/local/bin/
+        sudo mv prometheus-2.47.1.linux-amd64/consoles/ console_libraries/ /etc/prometheus/
+        sudo mv prometheus-2.47.1.linux-amd64/prometheus.yml /etc/prometheus/prometheus.yml
+        sudo chown -R prometheus:prometheus /etc/prometheus/ /data/
+
+    - name: Créer le fichier de service Prometheus
+      copy:
+        dest: /etc/systemd/system/prometheus.service
+        content: |
+          [Unit]
+          Description=Prometheus
+          Wants=network-online.target
+          After=network-online.target
+
+          [Service]
+          User=prometheus
+          Group=prometheus
+          Type=simple
+          Restart=on-failure
+          RestartSec=5s
+          ExecStart=/usr/local/bin/prometheus \
+            --config.file=/etc/prometheus/prometheus.yml \
+            --storage.tsdb.path=/data \
+            --web.console.templates=/etc/prometheus/consoles \
+            --web.console.libraries=/etc/prometheus/console_libraries \
+            --web.listen-address=0.0.0.0:9090 \
+            --web.enable-lifecycle
+
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: Activer et démarrer Prometheus
+      shell: |
+        sudo systemctl daemon-reload
+        sudo systemctl enable prometheus
+        sudo systemctl start prometheus
+
+    # -------------------- Installation Node Exporter --------------------
+    - name: Installer Node Exporter
+      shell: |
+        sudo useradd --system --no-create-home --shell /bin/false node_exporter
+        wget https://github.com/prometheus/node_exporter/releases/download/v1.6.1/node_exporter-1.6.1.linux-amd64.tar.gz
+        tar -xvf node_exporter-1.6.1.linux-amd64.tar.gz
+        sudo mv node_exporter-1.6.1.linux-amd64/node_exporter /usr/local/bin/
+        rm -rf node_exporter*
+
+    - name: Créer le fichier de service Node Exporter
+      copy:
+        dest: /etc/systemd/system/node_exporter.service
+        content: |
+          [Unit]
+          Description=Node Exporter
+          Wants=network-online.target
+          After=network-online.target
+
+          [Service]
+          User=node_exporter
+          Group=node_exporter
+          Type=simple
+          Restart=on-failure
+          RestartSec=5s
+          ExecStart=/usr/local/bin/node_exporter
+
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: Activer et démarrer Node Exporter
+      shell: |
+        sudo systemctl daemon-reload
+        sudo systemctl enable node_exporter
+        sudo systemctl start node_exporter
+
+    # -------------------- Installation Grafana --------------------
+    - name: Installer Grafana
+      shell: |
+        sudo apt-get install -y apt-transport-https software-properties-common
+        wget -q -O - https://packages.grafana.com/gpg.key | sudo apt-key add -
+        echo "deb https://packages.grafana.com/oss/deb stable main" | sudo tee -a /etc/apt/sources.list.d/grafana.list
+        sudo apt-get update
+        sudo apt-get -y install grafana
+        sudo systemctl enable grafana-server
+        sudo systemctl start grafana-server

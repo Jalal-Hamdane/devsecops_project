@@ -32,4 +32,7 @@ terraform.tfvars
 # Ignore terraform provider binaries and lock files
 terraform/.terraform/
 terraform/.terraform.lock.hcl
-
+# terraform apply secret file
+terraform/instance_ip.txt
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
