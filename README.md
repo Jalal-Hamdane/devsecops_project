@@ -18,10 +18,11 @@
 
 ### **Phase 1: Configuration Initiale et Déploiement**
 
-**Étape 1 : Lancer une instance EC2 (Ubuntu 22.04) ou lancer machine virtuelle:**
+**Étape 1 : Étape 1 : Lancer une instance EC2 (Ubuntu 22.04) ou une machine virtuelle via Terraform en tant que code, puis utiliser Ansible pour l'implémentation automatique et l'installation des outils recommandés:**
 
 - Provisionner une instance EC2 sur AWS avec Ubuntu 22.04.
 - Se connecter à l'instance via SSH.
+- Ou utilisez le script deploy.sh pour le déploiement automatique (tools).
 
 **Étape 2: Cloner le Code:**
 
@@ -74,9 +75,9 @@ Maintenant, recréez l'image Docker avec votre clé API :
 docker build --build-arg TMDB_V3_API_KEY=<your-api-key> -t netflix .
 ```
 
-**Phase 2: Sécurité**
+### **Phase 2: Sécurité :**
 
-1. **Installer SonarQube et Trivy :**
+1. **Étape 1:Installer SonarQube et Trivy :**
     - Installez SonarQube et Trivy sur l'instance EC2 pour analyser les vulnérabilités.
         
         sonarqube
@@ -104,15 +105,15 @@ docker build --build-arg TMDB_V3_API_KEY=<your-api-key> -t netflix .
         ```
         
         
-2. **Intégrer SonarQube et Configurer :**
+2. **Étape 2:Intégrer SonarQube et Configurer :**
     - Intégrer SonarQube avec votre pipeline CI/CD.
     - Configurer SonarQube pour analyser le code pour les problèmes de qualité et de sécurité.
 
 
-**Phase 3: Configuration CI/CD**
+### **Phase 3: Configuration CI/CD :**
 
-1. **Installer Jenkins pour l’automatisation :**
-    - Installez Jenkins sur l’instance EC2 pour automatiser le déploiement.:
+1. **Étape 1:Installer Jenkins pour l’automatisation :**
+    - Installez Jenkins sur l’instance EC2 pour automatiser le déploiement:
     Install Java
     
     ```bash
@@ -139,42 +140,33 @@ docker build --build-arg TMDB_V3_API_KEY=<your-api-key> -t netflix .
         
         publicIp:8080
         
-2. **Installer les Plugins Nécessaires dans Jenkins:**
+2. **Étape 2:Installer les Plugins Nécessaires dans Jenkins:**
 
 Allez dans "Manage Jenkins" → "Plugins" → "Available Plugins" et installez les plugins suivants : →
 
-Installer plugins
+- Installer plugins
 
-1 Eclipse Temurin Installer 
+    - 1 Eclipse Temurin Installer 
+    - 2 SonarQube Scanner 
+    - 3 NodeJs Plugin
+    - 4 Email Extension Plugin
 
-2 SonarQube Scanner 
+### **Phase 4: Configurer Java et NodeJS dans la Configuration Outils Globale**
 
-3 NodeJs Plugin
-
-4 Email Extension Plugin
-
-### **Configurer Java et NodeJS dans la Configuration Outils Globale**
-
-Allez dans "Manage Jenkins" → "Tools" → Installez JDK (17) et NodeJS (16).
+- Allez dans "Manage Jenkins" → "Tools" → Installez JDK (17) et NodeJS (16).
 
 
-### SonarQube
+### **Phase 5:SonarQube**
 
-Créer le token
-
-Allez sur le tableau de bord Jenkins → Gérer Jenkins → Identifiants → Ajouter un texte secret. Cela devrait ressembler à ceci.
-
-Après avoir ajouté le token Sonar,
-
-Cliquez sur Appliquer et Sauvegarder.
+- Créer le token
+- Allez sur le tableau de bord Jenkins → Gérer Jenkins → Identifiants → Ajouter un texte secret. Cela devrait ressembler à ceci.
+- Après avoir ajouté le token Sonar, Cliquez sur Appliquer et Sauvegarder.
 
 **L'option Configurer le Système** est utilisée dans Jenkins pour configurer différents serveurs.
 
-**Configuration des outils globaux** ist utilisée pour configurer différents outils que nous installons à l'aide de plugins.
-
+**Configuration des outils globaux** est utilisée pour configurer différents outils que nous installons à l'aide de plugins.
 Nous allons installer un scanner Sonar dans les outils.
-
-Créer un Webhook Jenkins 
+Créer un Webhook Jenkins :
 
 1. **Configurer le Pipeline CI/CD dans Jenkins :**
 - Créez un pipeline CI/CD dans Jenkins pour automatiser le déploiement de votre application.
@@ -354,7 +346,7 @@ pipeline{
 }
 
 
-Si vous obtenez une erreur "docker login failed", exécutez les commandes suivantes :
+- Si vous obtenez une erreur "docker login failed", exécutez les commandes suivantes :
 
 sudo su
 sudo usermod -aG docker jenkins
@@ -363,7 +355,7 @@ sudo systemctl restart jenkins
 
 ```
 
-**Phase 4: Surveillance**
+**Phase 6: Surveillance**
 
 1. **nstaller Prometheus et Grafana :**
 
@@ -747,3 +739,4 @@ Pour déployer une application avec ArgoCD, vous pouvez suivre ces étapes, que 
 
 1. **Nettoyer les instances EC2 AWS**
     - Terminez les instances EC2 AWS qui ne sont plus nécessaires.
+    - terraform destroy --auto-approve
