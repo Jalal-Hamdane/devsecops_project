@@ -36,3 +36,4 @@ terraform/.terraform.lock.hcl
 terraform/instance_ip.txt
 terraform/terraform.tfstate
 terraform/terraform.tfstate.backup
+terraform.tfstate
